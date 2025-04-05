@@ -51,3 +51,31 @@
     }
   }
 })();
+
+function isLevelEnough(skill, requiredLevel) {
+  try {
+    const allSkills = getAllSkillLevels();
+    allSkills.forEach((el) => {
+      if (el.textContent == skill) {
+        const currentLevel = Number(
+          el.parentElement.querySelector(".NavigationBar_level__3C7eR")
+            .textContent
+        );
+        if (currentLevel >= requiredLevel) {
+          return true;
+        }
+
+        return false;
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+function getAllSkillLevels() {
+  return document
+    .querySelector(".NavigationBar_navigationLinks__1XSSb")
+    .querySelectorAll(".NavigationBar_label__1uH-y");
+}
