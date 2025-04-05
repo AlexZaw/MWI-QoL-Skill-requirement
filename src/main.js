@@ -20,4 +20,14 @@
   }
 `;
   document.head.appendChild(RequiredLevelItemStyle);
+
+  new MutationObserver(waitItemInfoPopup).observe(document.body, {
+    childList: true,
+  });
+
+  function waitItemInfoPopup(changes, observer) {
+    if (document.querySelector(".MuiTooltip-popper")) {
+      getRequirements();
+    }
+  }
 })();
