@@ -27,7 +27,27 @@
 
   function waitItemInfoPopup(changes, observer) {
     if (document.querySelector(".MuiTooltip-popper")) {
-      getRequirements();
+      getItemRequirements();
+    }
+  }
+
+  function getItemRequirements() {
+    const toolTipText = document.querySelector(
+      ".ItemTooltipText_itemTooltipText__zFq3A"
+    );
+    try {
+      const detail =
+        toolTipText.querySelector(".ItemTooltipText_equipmentDetail__3sIHT") ||
+        toolTipText.querySelector(".ItemTooltipText_abilityDetail__3ZiU5");
+      const itemRequirementsElems =
+        detail.querySelector(":nth-child(2)").children;
+      const itemRequirementsArr = [];
+      [...itemRequirementsElems].forEach((el) => {
+        itemRequirementsArr.push(el.textContent.split(" "));
+      });
+      return itemRequirementsArr;
+    } catch (error) {
+      return false;
     }
   }
 })();
