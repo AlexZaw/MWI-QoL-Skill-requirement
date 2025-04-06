@@ -1,24 +1,25 @@
 // ==UserScript==
 // @name         MWI QoL Skill requirement
 // @namespace    http://tampermonkey.net/
-// @version      0.1.1
-// @description  Tools for MilkyWayIdle. Highlights equipment, tool, and ability level requirements in color.
+// @version      1.0
+// @description  Tools for MilkyWayIdle. Compares your current skill level to the item's requirements and highlights them in different colors depending on whether you are leveled up enough
 // @author       AlexZaw
 // @license      MIT License
 // @match        https://www.milkywayidle.com/*
 // @match        https://test.milkywayidle.com/*
-// @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
   "use strict";
+  const levelNotEnoughColor = "red";
+  const levelEnoughColor = "blue";
 
   const RequiredLevelItemStyle = document.createElement("style");
   RequiredLevelItemStyle.textContent = `
-  :where(.ItemTooltipText_itemTooltipText__zFq3A :where(.ItemTooltipText_equipmentDetail__3sIHT, .ItemTooltipText_abilityDetail__3ZiU5)) > div:nth-child(2) {
-    color: blue;
-  }
-`;
+      :where(.ItemTooltipText_itemTooltipText__zFq3A :where(.ItemTooltipText_equipmentDetail__3sIHT, .ItemTooltipText_abilityDetail__3ZiU5)) > div:nth-child(2) {
+        color: ${levelEnoughColor};
+      }
+    `;
   document.head.appendChild(RequiredLevelItemStyle);
 
   new MutationObserver(waitItemInfoPopup).observe(document.body, {
@@ -27,11 +28,11 @@
 
   function waitItemInfoPopup(changes, observer) {
     if (document.querySelector(".MuiTooltip-popper")) {
-      getItemRequirements();
+      main();
     }
   }
 
-  function getItemRequirements() {
+  function main() {
     const toolTipText = document.querySelector(
       ".ItemTooltipText_itemTooltipText__zFq3A"
     );
@@ -41,41 +42,45 @@
         toolTipText.querySelector(".ItemTooltipText_abilityDetail__3ZiU5");
       const itemRequirementsElems =
         detail.querySelector(":nth-child(2)").children;
-      const itemRequirementsArr = [];
       [...itemRequirementsElems].forEach((el) => {
-        itemRequirementsArr.push(el.textContent.split(" "));
+        const currentStat = el.textContent.split(" ");
+        const requiredLevel = Number(currentStat[1]);
+        const requiredSkill = currentStat[2];
+        if (!isLevelEnough(requiredSkill, requiredLevel)) {
+          el.style.color = levelNotEnoughColor;
+          el.textContent = `!!! ${el.textContent} !!!`;
+        }
       });
-      return itemRequirementsArr;
     } catch (error) {
       return false;
     }
   }
-})();
 
-function isLevelEnough(skill, requiredLevel) {
-  try {
-    const allSkills = getAllSkillLevels();
-    allSkills.forEach((el) => {
-      if (el.textContent == skill) {
-        const currentLevel = Number(
-          el.parentElement.querySelector(".NavigationBar_level__3C7eR")
-            .textContent
-        );
-        if (currentLevel >= requiredLevel) {
-          return true;
+  function isLevelEnough(requiredSkill, requiredLevel) {
+    try {
+      const allSkills = getAllSkillLevels();
+      for (let i = 0; i < allSkills.length; i++) {
+        if (allSkills[i].textContent == requiredSkill) {
+          const currentLevel = Number(
+            allSkills[i].parentElement.querySelector(
+              ".NavigationBar_level__3C7eR"
+            ).textContent
+          );
+          if (currentLevel >= requiredLevel) {
+            return true;
+          } else {
+            return false;
+          }
         }
-
-        return false;
       }
-    });
-  } catch (error) {
-    console.log(error);
-    return false;
+    } catch (error) {
+      return false;
+    }
   }
-}
 
-function getAllSkillLevels() {
-  return document
-    .querySelector(".NavigationBar_navigationLinks__1XSSb")
-    .querySelectorAll(".NavigationBar_label__1uH-y");
-}
+  function getAllSkillLevels() {
+    return document
+      .querySelector(".NavigationBar_navigationLinks__1XSSb")
+      .querySelectorAll(".NavigationBar_label__1uH-y");
+  }
+})();
