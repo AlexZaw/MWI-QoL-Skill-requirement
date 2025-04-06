@@ -58,14 +58,26 @@
 
   function isLevelEnough(requiredSkill, requiredLevel) {
     try {
+      let currentLevel;
       const allSkills = getAllSkillLevels();
       for (let i = 0; i < allSkills.length; i++) {
-        if (allSkills[i].textContent == requiredSkill) {
-          const currentLevel = Number(
-            allSkills[i].parentElement.querySelector(
-              ".NavigationBar_level__3C7eR"
-            ).textContent
-          );
+        if (
+          allSkills[i].textContent == requiredSkill ||
+          requiredSkill == "Total"
+        ) {
+          if (requiredSkill == "Total") {
+            currentLevel = Number(
+              document
+                .querySelector(".Header_totalLevel__8LY3Q")
+                .textContent.split(" ")[2]
+            );
+          } else {
+            currentLevel = Number(
+              allSkills[i].parentElement.querySelector(
+                ".NavigationBar_level__3C7eR"
+              ).textContent
+            );
+          }
           if (currentLevel >= requiredLevel) {
             return true;
           } else {
