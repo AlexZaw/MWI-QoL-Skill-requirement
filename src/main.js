@@ -10,89 +10,93 @@
 // ==/UserScript==
 
 (function () {
-  "use strict";
-  const levelNotEnoughColor = "red";
-  const levelEnoughColor = "blue";
+    'use strict';
+    const levelNotEnoughColor = 'red';
+    const levelEnoughColor = 'blue';
 
-  const RequiredLevelItemStyle = document.createElement("style");
-  RequiredLevelItemStyle.textContent = `
+    const RequiredLevelItemStyle = document.createElement('style');
+    RequiredLevelItemStyle.textContent = `
       :where(.ItemTooltipText_itemTooltipText__zFq3A :where(.ItemTooltipText_equipmentDetail__3sIHT, .ItemTooltipText_abilityDetail__3ZiU5)) > div:nth-child(2) {
         color: ${levelEnoughColor};
       }
     `;
-  document.head.appendChild(RequiredLevelItemStyle);
+    document.head.appendChild(RequiredLevelItemStyle);
 
-  new MutationObserver(waitItemInfoPopup).observe(document.body, {
-    childList: true,
-  });
+    new MutationObserver(waitItemInfoPopup).observe(document.body, {
+        childList: true,
+    });
 
-  function waitItemInfoPopup(changes, observer) {
-    if (document.querySelector(".MuiTooltip-popper")) {
-      main();
-    }
-  }
-
-  function main() {
-    const toolTipText = document.querySelector(
-      ".ItemTooltipText_itemTooltipText__zFq3A"
-    );
-    try {
-      const detail =
-        toolTipText.querySelector(".ItemTooltipText_equipmentDetail__3sIHT") ||
-        toolTipText.querySelector(".ItemTooltipText_abilityDetail__3ZiU5");
-      const itemRequirementsElems =
-        detail.querySelector(":nth-child(2)").children;
-      [...itemRequirementsElems].forEach((el) => {
-        const currentStat = el.textContent.split(" ");
-        const requiredLevel = Number(currentStat[1]);
-        const requiredSkill = currentStat[2];
-        if (!isLevelEnough(requiredSkill, requiredLevel)) {
-          el.style.color = levelNotEnoughColor;
-          el.textContent = `!!! ${el.textContent} !!!`;
+    function waitItemInfoPopup(changes, observer) {
+        if (document.querySelector('.MuiTooltip-popper')) {
+            main();
         }
-      });
-    } catch (error) {
-      return false;
     }
-  }
 
-  function isLevelEnough(requiredSkill, requiredLevel) {
-    try {
-      let currentLevel;
-      const allSkills = getAllSkillLevels();
-      for (let i = 0; i < allSkills.length; i++) {
-        if (
-          allSkills[i].textContent == requiredSkill ||
-          requiredSkill == "Total"
-        ) {
-          if (requiredSkill == "Total") {
-            currentLevel = Number(
-              document
-                .querySelector(".Header_totalLevel__8LY3Q")
-                .textContent.split(" ")[2]
-            );
-          } else {
-            currentLevel = Number(
-              allSkills[i].parentElement.querySelector(
-                ".NavigationBar_level__3C7eR"
-              ).textContent
-            );
-          }
-          if (currentLevel >= requiredLevel) {
-            return true;
-          } else {
+    function main() {
+        const toolTipText = document.querySelector(
+            '.ItemTooltipText_itemTooltipText__zFq3A'
+        );
+        try {
+            const detail =
+                toolTipText.querySelector(
+                    '.ItemTooltipText_equipmentDetail__3sIHT'
+                ) ||
+                toolTipText.querySelector(
+                    '.ItemTooltipText_abilityDetail__3ZiU5'
+                );
+            const itemRequirementsElems =
+                detail.querySelector(':nth-child(2)').children;
+            [...itemRequirementsElems].forEach((el) => {
+                const currentStat = el.textContent.split(' ');
+                const requiredLevel = Number(currentStat[1]);
+                const requiredSkill = currentStat[2];
+                if (!isLevelEnough(requiredSkill, requiredLevel)) {
+                    el.style.color = levelNotEnoughColor;
+                    el.textContent = `!!! ${el.textContent} !!!`;
+                }
+            });
+        } catch (error) {
             return false;
-          }
         }
-      }
-    } catch (error) {
-      return false;
     }
-  }
 
-  function getAllSkillLevels() {
-    return document
-      .querySelector(".NavigationBar_navigationLinks__1XSSb")
-      .querySelectorAll(".NavigationBar_label__1uH-y");
-  }
+    function isLevelEnough(requiredSkill, requiredLevel) {
+        try {
+            let currentLevel;
+            const allSkills = getAllSkillLevels();
+            for (let i = 0; i < allSkills.length; i++) {
+                if (
+                    allSkills[i].textContent == requiredSkill ||
+                    requiredSkill == 'Total'
+                ) {
+                    if (requiredSkill == 'Total') {
+                        currentLevel = Number(
+                            document
+                                .querySelector('.Header_totalLevel__8LY3Q')
+                                .textContent.split(' ')[2]
+                        );
+                    } else {
+                        currentLevel = Number(
+                            allSkills[i].parentElement.querySelector(
+                                '.NavigationBar_level__3C7eR'
+                            ).textContent
+                        );
+                    }
+                    if (currentLevel >= requiredLevel) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function getAllSkillLevels() {
+        return document
+            .querySelector('.NavigationBar_navigationLinks__1XSSb')
+            .querySelectorAll('.NavigationBar_label__1uH-y');
+    }
 })();
