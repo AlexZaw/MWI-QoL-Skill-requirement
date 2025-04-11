@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MWI QoL Skill requirement
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Tools for MilkyWayIdle. Compares your current skill level to the item's requirements and highlights them in different colors depending on whether you are leveled up enough
 // @author       AlexZaw
 // @license      MIT License
@@ -79,7 +79,7 @@
                         currentLevel = Number(
                             allSkills[i].parentElement.querySelector(
                                 '.NavigationBar_level__3C7eR'
-                            ).textContent
+                            ).textContent.split('+')[0]
                         );
                     }
                     if (currentLevel >= requiredLevel) {
